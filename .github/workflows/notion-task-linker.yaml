@@ -1,0 +1,32 @@
+name: Notion Task Linker
+
+on:
+  workflow_call:
+    inputs:
+      workspace:
+        required: true
+        type: string
+
+jobs:
+  link_notion_task:
+    name: Link Notion Task
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check Branch
+        id: check-branch
+        run: |
+          notion_task=$(echo ${{ github.head_ref }} | perl -ne 'm%^([A-Za-z]+?-[\d]+)%; print $1')
+          if ! test -z "$notion_task"; then
+            echo "match=true" >> $GITHUB_OUTPUT
+            echo "notion_task=$notion_task" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: tzkhan/pr-update-action@bbd4c9395df8a9c4ef075b8b7fe29f2ca76cdca9
+        if: steps.check-branch.outputs.match == 'true'
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          head-branch-regex: '.*' # not used
+          body-update-action: prefix
+          body-template: |
+            Notion Task: https://www.notion.so/${{ inputs.workspace }}/${{ steps.check-branch.outputs.notion_task }}
+            ---
