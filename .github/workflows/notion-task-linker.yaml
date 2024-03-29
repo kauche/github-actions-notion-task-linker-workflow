@@ -12,6 +12,8 @@ jobs:
     name: Link Notion Task
     runs-on: ubuntu-22.04
     steps:
+      - uses: actions/checkout@v4.1.1
+
       - name: Check Branch
         id: check-branch
         run: |
