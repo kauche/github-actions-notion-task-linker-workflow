@@ -23,6 +23,8 @@ jobs:
 
       - name: update PR description
         if: steps.check-branch.outputs.match == 'true'
+        env:
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         run: |
           DESCRIPTION=$(gh pr view ${{ github.event.pull_request.number }} --json body --jq .body)
           gh pr edit ${{ github.event.pull_request.number }} --body  "Notion Task: https://www.notion.so/${{ inputs.workspace }}/${{ steps.check-branch.outputs.notion_task }}
