@@ -21,12 +21,10 @@ jobs:
             echo "notion_task=$notion_task" >> $GITHUB_OUTPUT
           fi
 
-      - uses: tzkhan/pr-update-action@bbd4c9395df8a9c4ef075b8b7fe29f2ca76cdca9
+      - name: update PR description
         if: steps.check-branch.outputs.match == 'true'
-        with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          head-branch-regex: '.*' # not used
-          body-update-action: prefix
-          body-template: |
-            Notion Task: https://www.notion.so/${{ inputs.workspace }}/${{ steps.check-branch.outputs.notion_task }}
-            ---
+        run: |
+          DESCRIPTION=$(gh pr view ${{ github.event.pull_request.number }} --json body --jq .body)
+          gh pr edit ${{ github.event.pull_request.number }} --body  "Notion Task: https://www.notion.so/${{ inputs.workspace }}/${{ steps.check-branch.outputs.notion_task }}
+          ---
+          ${DESCRIPTION}"
